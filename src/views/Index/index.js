@@ -4,7 +4,7 @@
 import React from 'react'
 import { Carousel, Flex, Grid, NavBar, Icon} from 'antd-mobile'
 import './index.scss'
-import API, {IMG_BASE_URL} from '../../utils/index.js'
+import API, {IMG_BASE_URL,getCurrentCity} from '../../utils/index.js'
 import img1 from '../../assets/images/nav-1.png'
 import img2 from '../../assets/images/nav-2.png'
 import img3 from '../../assets/images/nav-3.png'
@@ -37,7 +37,9 @@ class Index extends React.Component {
     // 最新资讯数据
     newsData:[],
     // 轮播图片初始高度
-    imgHeight: 176
+    imgHeight: 176,
+    // 当前城市
+    currentCity: '北京',
   }
 
   // 加载轮播图接口数据
@@ -64,11 +66,19 @@ class Index extends React.Component {
     })
   }
 
+  // 加载NavBar左侧当前城市
+  loadCurrentCity = async () => {
+    let city = await getCurrentCity()
+    this.setState({
+      currentCity: city.label
+    })
+  }
   // 生命周期函数
   componentDidMount () {
     this.loadSwiper()
     this.loadGroup()
     this.loadNews()
+    this.loadCurrentCity()
   }
 
   // 动态生成轮播图条目
@@ -125,10 +135,10 @@ class Index extends React.Component {
         {/* 顶部导航栏 */}
         <NavBar
           mode="dark"
-          icon={<div>北京</div>}
+          icon={<div>{this.state.currentCity}</div>}
           onLeftClick={() => {
             // 控制路由跳转
-            this.props.history.push('/citylist')
+            this.props.history.push('/city')
           }}
           rightContent={
             <Icon key="0" type="search" style={{ marginRight: '6px' }} />
