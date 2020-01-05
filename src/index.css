@@ -1,9 +1,12 @@
-html,
-body {
+html, body {
     height: 100%;
     color: #333;
     background-color: #fff;
 }
+
+html body {
+    background-color: #fff;
+} 
 
 * {
     touch-action: pan-y;
@@ -22,6 +25,7 @@ ul {
 
 p,
 h3,
+dd,
 ul {
     padding: 0;
     margin: 0;

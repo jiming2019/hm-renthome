@@ -1,0 +1,32 @@
+.map-container {
+  height: 100%;
+  .nav-bar {
+    position: fixed;
+    width: 100%;
+    top: 0;
+    background-color: #fff;
+    z-index: 9999;
+  }
+  #mymap {
+    padding-top: 45px;
+  }
+  .labelContent {
+    width: 80px;
+    height: 80px;
+    border-radius: 40px;
+    background-color: #00A067;
+    text-align: center;
+    color: #fff;
+    font-size: 16px;
+    div {
+      padding-top: 15px;
+    }
+  }
+  .areaContent {
+    width: 180px;
+    color: #fff;
+    font-size: 18px;
+    text-align: center;
+    background-color: #00A067;
+  }
+}

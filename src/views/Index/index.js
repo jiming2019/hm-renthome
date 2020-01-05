@@ -2,9 +2,10 @@
   主页模块
 */
 import React from 'react'
-import { Carousel, Flex, Grid, NavBar, Icon} from 'antd-mobile'
+import { Carousel, Flex, Grid, WingBlank, NavBar, Icon } from 'antd-mobile'
 import './index.scss'
-import API, {IMG_BASE_URL,getCurrentCity} from '../../utils/index.js'
+// import axios from 'axios'
+import API, {IMG_BASE_URL, getCurrentCity} from '../../utils/index.js'
 import img1 from '../../assets/images/nav-1.png'
 import img2 from '../../assets/images/nav-2.png'
 import img3 from '../../assets/images/nav-3.png'
@@ -13,8 +14,15 @@ import img4 from '../../assets/images/nav-4.png'
 class Index extends React.Component {
 
   state = {
-    // 轮播图数据
+    // swiperData: [{
+    //   imgSrc: 'https://zos.alipayobjects.com/rmsportal/AiyWuByWklrrUDlFignR.png'
+    // }, {
+    //   imgSrc: 'https://zos.alipayobjects.com/rmsportal/TekJlZRVCjLFexlOCuWn.png'
+    // }, {
+    //   imgSrc: 'https://zos.alipayobjects.com/rmsportal/IJOtIlfsYdTyaDTRVrLI.png'
+    // }]
     swiperData: [],
+    currentCity: '北京',
     menuData: [{
       id: 1,
       imgSrc: img1,
@@ -30,66 +38,88 @@ class Index extends React.Component {
     }, {
       id: 4,
       imgSrc: img4,
-      name: '去出租'
+      name: '去出租',
+      path: '/rentadd'
     }],
-    // 租房小组数据
     groupData: [],
-    // 最新资讯数据
-    newsData:[],
-    // 轮播图片初始高度
-    imgHeight: 176,
-    // 当前城市
-    currentCity: '北京',
+    newsData: [],
+    imgHeight: 176
   }
 
-  // 加载轮播图接口数据
   loadSwiper = async () => {
+    // 加载轮播图接口数据
     let res = await API.get('home/swiper')
     this.setState({
       swiperData: res.body
     })
   }
 
-  // 加载租房小组接口数据
   loadGroup = async () => {
+    // 加载租房小组接口数据
     let res = await API.get('home/groups')
     this.setState({
       groupData: res.body
     })
   }
 
-  // 加载最新资讯接口数据
   loadNews = async () => {
+    // 加载最新资讯接口数据
     let res = await API.get('home/news')
     this.setState({
       newsData: res.body
     })
   }
 
-  // 加载NavBar左侧当前城市
-  loadCurrentCity = async () => {
+  async componentDidMount () {
+    this.loadSwiper()
+    this.loadGroup()
+    this.loadNews()
+    // 从本地缓存获取当前城市的数据
+    // let city = localStorage.getItem('currentCity')
+    // let obj = null
+    // if (city) {
+    //   obj = JSON.parse(city)
+    //   this.setState({
+    //     currentCity: obj.label
+    //   })
+    // } else {
+    //   // 通过地理定位获取当前城市
+    //   const position = new window.BMap.LocalCity()
+    //   position.get( async (ret) => {
+    //     this.setState({
+    //       currentCity: ret.name
+    //     })
+    //     // 根据地理定位得到的城市名称获取城市的详细信息
+    //     let res = await API.get('/area/info', {
+    //       params: {
+    //         name: ret.name
+    //       }
+    //     })
+    //     // 缓存当前城市数据
+    //     localStorage.setItem('currentCity', JSON.stringify(res.body))
+    //   })
+    // }
     let city = await getCurrentCity()
     this.setState({
       currentCity: city.label
     })
-  }
-  // 生命周期函数
-  componentDidMount () {
-    this.loadSwiper()
-    this.loadGroup()
-    this.loadNews()
-    this.loadCurrentCity()
+    // .then(city => {
+    //   this.setState({
+    //     currentCity: city.label
+    //   })
+    // })
+    
   }
 
-  // 动态生成轮播图条目
   renderSwiperImem = () => {
+    // 动态生成轮播图条目
     return this.state.swiperData.map((item, index) => (
       <img 
-        key={index}
-        src={IMG_BASE_URL + item.imgSrc} 
         style={{height: this.state.imgHeight}}
+        key={index} 
+        src={IMG_BASE_URL + item.imgSrc} 
         onLoad={() => {
-          // 解决初次加载图片没有高度问题
+          // fire window resize event to change height
           window.dispatchEvent(new Event('resize'));
           this.setState({ imgHeight: 'auto' });
         }}
@@ -97,18 +127,23 @@ class Index extends React.Component {
     ))
   }
 
-  // 动态生成菜单项
   renderMenuItem = () => {
+    // 动态生成菜单项
     return this.state.menuData.map(item => (
-      <Flex.Item key={item.id}>
+      <Flex.Item key={item.id} onClick={() => {
+        // 控制路由跳转
+        if (item.path) {
+          this.props.history.push(item.path)
+        }
+      }}>
         <img src={item.imgSrc} alt=""/>
         <p>{item.name}</p>
       </Flex.Item>
     ))
   }
 
-  // 生成最新资讯的列表模板
   renderNewsItem = () => {
+    // 生成最新资讯的列表模板
     return this.state.newsData.map(item => (
       <div className="news-item" key={item.id}>
         <div className="imgwrap">
@@ -138,7 +173,7 @@ class Index extends React.Component {
           icon={<div>{this.state.currentCity}</div>}
           onLeftClick={() => {
             // 控制路由跳转
-            this.props.history.push('/city')
+            this.props.history.push('/citylist')
           }}
           rightContent={
             <Icon key="0" type="search" style={{ marginRight: '6px' }} />
@@ -148,11 +183,11 @@ class Index extends React.Component {
         <Carousel autoplay={true} infinite={true}>
           {this.renderSwiperImem()}
         </Carousel>
-        {/*首页菜单*/}
+        {/* 首页菜单 */}
         <Flex className='menu'>
           {this.renderMenuItem()}
         </Flex>
-        {/*租房小组标题*/}
+        {/* 租房小组标题 */}
         <div className="group">
           <Flex className="group-title" justify="between">
             <h3>租房小组</h3>
@@ -163,6 +198,7 @@ class Index extends React.Component {
             columnNum={2}
             square={false}
             renderItem={item => (
+              <WingBlank size='sm'>
                 <Flex className="grid-item" justify="between">
                   <div className="desc">
                     <h3>{item.title}</h3>
@@ -170,6 +206,7 @@ class Index extends React.Component {
                   </div>
                   <img src={`${IMG_BASE_URL}${item.imgSrc}`} alt="" />
                 </Flex>
+              </WingBlank>
             )}
           />
         </div>

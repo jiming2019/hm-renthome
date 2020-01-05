@@ -1,14 +1,12 @@
 /* 菜单样式 */
 
 .menu {
-  padding-bottom: 10px;
-  background-color: #fff;
-  .am-flexbox {
-    padding-top: 10px;
+  padding-top: 10px;
+  img {
+    height: 50px;
+  }
+  &.am-flexbox {
     text-align: center;
-    img {
-      height: 50px;
-    }
   }
 }
 
